@@ -6,7 +6,6 @@ import { GITHUB_URL, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import { getGitHubSnapshot } from '../lib/github';
 
 const github = await getGitHubSnapshot();
-const profileRepo = github.repos.find((repo) => repo.name.toLowerCase() === github.profile.login.toLowerCase());
 const primaryRepos = github.repos.filter((repo) => !repo.fork).slice(0, 5);
 ---
 
@@ -66,11 +65,6 @@ const primaryRepos = github.repos.filter((repo) => !repo.fork).slice(0, 5);
 					</div>
 					<div class="link-row">
 						<a class="chip" data-kind="accent" href={GITHUB_URL} target="_blank">GitHub</a>
-						{
-							profileRepo && (
-								<a class="chip" href={profileRepo.url} target="_blank">Profile README Repo</a>
-							)
-						}
 						<a class="chip" href="/projects">Projects 页面</a>
 					</div>
 				</article>
@@ -98,14 +92,6 @@ const primaryRepos = github.repos.filter((repo) => !repo.fork).slice(0, 5);
 					</ul>
 				</article>
 
-				<article class="card">
-					<h2>同步策略</h2>
-					<ul>
-						<li>首页和项目页在构建时从 GitHub API 拉取公开数据。</li>
-						<li>仓库更新后，重新部署即可同步到站点内容。</li>
-						<li>文章体系与项目演进保持同一叙事线，避免站点和仓库割裂。</li>
-					</ul>
-				</article>
 			</section>
 		</main>
 		<Footer />

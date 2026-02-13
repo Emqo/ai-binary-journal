@@ -16,6 +16,5 @@ export const NAV_LINKS = [
 
 export const SOCIAL_LINKS = [
 	{ href: GITHUB_URL, label: 'GitHub' },
-	{ href: `${GITHUB_URL}/${GITHUB_USERNAME}`, label: 'Profile README' },
 	{ href: '/rss.xml', label: 'RSS' },
 ];

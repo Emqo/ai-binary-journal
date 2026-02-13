@@ -3,25 +3,28 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { GITHUB_URL, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import { getPublishedPosts, listTags } from '../lib/blog';
+import { getGitHubSnapshot } from '../lib/github';
 
+const github = await getGitHubSnapshot();
 const publishedPosts = await getPublishedPosts();
 const latestPosts = publishedPosts.slice(0, 4);
 const topTags = listTags(publishedPosts).slice(0, 8);
+const featuredRepos = github.featuredRepos.slice(0, 4);
 
-const tracks = [
+const focusTracks = [
 	{
-		title: 'Binary Fundamentals',
-		description: 'ELF/PE、汇编、调试器、内存布局。目标是建立可靠的底层心智模型。',
+		title: 'AI + Binary',
+		description: '把 LLM、RAG 融入逆向分析，形成可复用的自动化流程。',
 	},
 	{
-		title: 'AI Systems Engineering',
-		description: 'LLM/RAG/Agent 工程化实践，关注评测、可靠性和可观测性。',
+		title: 'Reverse Engineering',
+		description: '围绕 ELF/PE、调试器、系统调用链，强化底层分析能力。',
 	},
 	{
-		title: 'AI x Reverse Workflow',
-		description: '把 LLM 放进逆向流程：样本摘要、脚本生成、知识沉淀与检索。',
+		title: 'Engineering Discipline',
+		description: '坚持记录、复盘和验证，让每次学习都有可追溯产物。',
 	},
 ];
 ---
@@ -33,60 +36,90 @@ const tracks = [
 		<style>
 			.hero {
 				display: grid;
-				grid-template-columns: 1.3fr 1fr;
-				gap: 1.2rem;
+				grid-template-columns: 1.2fr 1fr;
+				gap: 1rem;
 				margin-bottom: 1.2rem;
 			}
-			.hero-copy {
-				padding: 1.35rem;
-				background: linear-gradient(145deg, #ffffff 0%, #eef5fb 100%);
-				border: 1px solid var(--line);
-				border-radius: var(--radius-lg);
-				box-shadow: var(--surface-shadow);
+			.identity-card {
+				display: flex;
+				gap: 1rem;
+				align-items: flex-start;
 			}
-			.hero-copy p {
-				margin: 0 0 0.8rem;
+			.avatar {
+				width: 92px;
+				height: 92px;
+				border-radius: 24px;
+				border: 1px solid var(--line);
+			}
+			.identity-card p {
+				margin-bottom: 0.75rem;
 				color: var(--ink-soft);
 			}
-			.value-list {
-				padding-left: 1.2rem;
-				margin: 0;
+			.stat-grid {
+				display: grid;
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+				gap: 0.45rem;
+				margin-top: 0.6rem;
 			}
-			.value-list li {
-				margin-bottom: 0.45rem;
+			.stat {
+				border: 1px solid var(--line);
+				border-radius: 12px;
+				padding: 0.5rem 0.6rem;
+				background: color-mix(in oklab, var(--bg-1), var(--bg-0) 38%);
 			}
-			.quick-panel {
-				padding: 1.1rem;
-				background: #0f1d2e;
-				color: #ecf3ff;
-				border-radius: var(--radius-lg);
-				border: 1px solid #24374f;
+			.stat strong {
+				display: block;
+				font-size: 1rem;
+				color: var(--ink-0);
 			}
-			.quick-panel p {
-				color: #bfd0ea;
-				font-size: 0.95rem;
-				margin-bottom: 0.7rem;
+			.stat span {
+				font-size: 0.78rem;
+				color: var(--ink-soft);
 			}
-			.tag-list {
+			.gh-links {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.45rem;
+				margin-top: 0.65rem;
+			}
+			.gh-links a {
+				text-decoration: none;
+			}
+			.panel-title {
+				font-size: 1.05rem;
+				margin-bottom: 0.65rem;
+			}
+			.repo-card h3 {
+				font-size: 1.05rem;
+				margin-bottom: 0.5rem;
+			}
+			.repo-card p {
+				color: var(--ink-soft);
+				margin-bottom: 0.8rem;
+			}
+			.repo-card a {
+				text-decoration: none;
+			}
+			.tags-wrap {
 				display: flex;
 				flex-wrap: wrap;
 				gap: 0.45rem;
 			}
-			.tag-list a {
-				color: inherit;
+			.tags-wrap a {
 				text-decoration: none;
 			}
 			.latest-card h3 {
+				font-size: 1.08rem;
 				margin-bottom: 0.45rem;
 			}
 			.latest-card p {
 				margin-bottom: 0.75rem;
 				color: var(--ink-soft);
 			}
-			.tracks {
-				margin-top: 2rem;
+			.focus-section {
+				margin-top: 1.5rem;
 			}
-			@media (max-width: 880px) {
+			@media (max-width: 900px) {
 				.hero {
 					grid-template-columns: 1fr;
 				}
@@ -97,27 +130,75 @@ const tracks = [
 		<Header />
 		<main>
 			<section class="hero">
-				<div class="hero-copy">
-					<h1>AI 二进制工程学习档案</h1>
-					<p>{SITE_DESCRIPTION}</p>
-					<ul class="value-list">
-						<li>每篇都给出问题、过程、结论与可复现步骤。</li>
-						<li>关注 AI 与 Reverse 的交叉工作流，不做泛泛而谈。</li>
-						<li>持续发布周报，记录路线偏差与修正。</li>
-					</ul>
-				</div>
-				<div class="quick-panel">
-					<h2>当前聚焦</h2>
-					<p>优先把基础打牢，再逐步构建自动化分析链。</p>
-					<div class="tag-list">
+				<article class="card identity-card">
+					<img class="avatar" src={github.profile.avatarUrl} alt={`${github.profile.login} avatar`} />
+					<div>
+						<h1>{github.profile.name} 的技术博客</h1>
+						<p>{github.profile.bio}</p>
+						<div class="stat-grid">
+							<div class="stat">
+								<strong>{github.profile.publicRepos}</strong>
+								<span>Public Repos</span>
+							</div>
+							<div class="stat">
+								<strong>{github.totalStars}</strong>
+								<span>Total Stars</span>
+							</div>
+							<div class="stat">
+								<strong>{github.profile.followers}</strong>
+								<span>Followers</span>
+							</div>
+							<div class="stat">
+								<strong>{github.profile.following}</strong>
+								<span>Following</span>
+							</div>
+						</div>
+						<div class="gh-links">
+							<a class="chip" data-kind="accent" href={GITHUB_URL} target="_blank">GitHub Profile</a>
+							<a class="chip" href="/projects">项目清单</a>
+							<a class="chip" href="/blog">学习日志</a>
+						</div>
+					</div>
+				</article>
+				<article class="card">
+					<h2 class="panel-title">GitHub 技术足迹</h2>
+					<div class="tags-wrap">
+						{github.topLanguages.map((item) => <span class="chip">{item.language} ({item.count})</span>)}
+					</div>
+					<hr />
+					<h3 class="panel-title">内容标签</h3>
+					<div class="tags-wrap">
 						{topTags.map(({ tag }) => <a class="chip" href={`/tags/${tag}/`}>#{tag}</a>)}
 					</div>
-				</div>
+				</article>
 			</section>
 
 			<section>
 				<div class="section-title">
-					<h2>最新文章</h2>
+					<h2>GitHub 最新项目</h2>
+				</div>
+				<div class="card-grid">
+					{
+						featuredRepos.map((repo) => (
+							<article class="card repo-card">
+								<h3>
+									<a href={repo.url} target="_blank">{repo.name}</a>
+								</h3>
+								<p>{repo.description}</p>
+								<div class="meta-line">
+									{repo.language && <span class="chip">{repo.language}</span>}
+									<span class="chip">★ {repo.stars}</span>
+									<span class="chip">Fork {repo.forks}</span>
+								</div>
+							</article>
+						))
+					}
+				</div>
+			</section>
+
+			<section class="focus-section">
+				<div class="section-title">
+					<h2>最新博客</h2>
 				</div>
 				<div class="card-grid">
 					{
@@ -137,13 +218,13 @@ const tracks = [
 				</div>
 			</section>
 
-			<section class="tracks">
+			<section class="focus-section">
 				<div class="section-title">
-					<h2>学习主线</h2>
+					<h2>当前学习主线</h2>
 				</div>
 				<div class="card-grid">
 					{
-						tracks.map((track) => (
+						focusTracks.map((track) => (
 							<article class="card">
 								<h3>{track.title}</h3>
 								<p>{track.description}</p>

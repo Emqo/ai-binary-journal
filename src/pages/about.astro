@@ -2,7 +2,12 @@
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { GITHUB_URL, SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { getGitHubSnapshot } from '../lib/github';
+
+const github = await getGitHubSnapshot();
+const profileRepo = github.repos.find((repo) => repo.name.toLowerCase() === github.profile.login.toLowerCase());
+const primaryRepos = github.repos.filter((repo) => !repo.fork).slice(0, 5);
 ---
 
 <!doctype html>
@@ -14,6 +19,32 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 				display: grid;
 				gap: 1rem;
 			}
+			.header-line {
+				display: flex;
+				align-items: center;
+				gap: 0.9rem;
+			}
+			.avatar {
+				width: 72px;
+				height: 72px;
+				border-radius: 18px;
+				border: 1px solid var(--line);
+			}
+			.repo-list {
+				margin: 0;
+				padding-left: 1.2rem;
+			}
+			.repo-list li {
+				margin-bottom: 0.35rem;
+			}
+			.link-row {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+			}
+			.link-row a {
+				text-decoration: none;
+			}
 		</style>
 	</head>
 	<body>
@@ -21,28 +52,58 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 		<main>
 			<section class="about-wrap">
 				<article class="card">
-					<h1>关于这个博客</h1>
-					<p>
-						这是一个面向 <strong>AI 二进制工程</strong> 的学习记录站点，目标是把每一次实验过程沉淀为可复用资产。
-					</p>
-					<p>
-						内容包括：逆向分析笔记、LLM 工程实践、AI x Binary 工作流实验、以及每周复盘。
-					</p>
+					<div class="header-line">
+						<img class="avatar" src={github.profile.avatarUrl} alt="avatar" />
+						<div>
+							<h1>{github.profile.name}</h1>
+							<p>{github.profile.bio}</p>
+						</div>
+					</div>
+					<div class="meta-line">
+						<span class="chip" data-kind="accent">@{github.profile.login}</span>
+						<span class="chip">账号创建 {github.profile.createdAt.toLocaleDateString('zh-CN')}</span>
+						<span class="chip">公开仓库 {github.profile.publicRepos}</span>
+					</div>
+					<div class="link-row">
+						<a class="chip" data-kind="accent" href={GITHUB_URL} target="_blank">GitHub</a>
+						{
+							profileRepo && (
+								<a class="chip" href={profileRepo.url} target="_blank">Profile README Repo</a>
+							)
+						}
+						<a class="chip" href="/projects">Projects 页面</a>
+					</div>
 				</article>
+
 				<article class="card">
-					<h2>写作原则</h2>
-					<ul>
-						<li>每篇文章至少有一个可复现实验。</li>
-						<li>结论必须绑定证据，不写凭印象的结论。</li>
-						<li>失败过程也记录，避免重复踩坑。</li>
+					<h2>技术方向</h2>
+					<p>
+						博客重点聚焦 <strong>AI + Binary Engineering</strong>：逆向工程、系统底层、LLM 工程化与自动化分析流程。
+					</p>
+					<div class="meta-line">
+						{github.topLanguages.map((item) => <span class="chip">{item.language} ({item.count})</span>)}
+					</div>
+				</article>
+
+				<article class="card">
+					<h2>近期活跃项目</h2>
+					<ul class="repo-list">
+						{
+							primaryRepos.map((repo) => (
+								<li>
+									<a href={repo.url} target="_blank">{repo.name}</a> · {repo.language ?? 'Unknown'}
+								</li>
+							))
+						}
 					</ul>
 				</article>
+
 				<article class="card">
-					<h2>你可以期待什么</h2>
+					<h2>同步策略</h2>
 					<ul>
-						<li>持续更新的学习路线图与阶段目标。</li>
-						<li>真实工具链实践：GDB、Frida、Python、LLM 工具栈。</li>
-						<li>从“能跑”走向“可维护”的工程化过程。</li>
+						<li>首页和项目页在构建时从 GitHub API 拉取公开数据。</li>
+						<li>仓库更新后，重新部署即可同步到站点内容。</li>
+						<li>文章体系与项目演进保持同一叙事线，避免站点和仓库割裂。</li>
 					</ul>
 				</article>
 			</section>

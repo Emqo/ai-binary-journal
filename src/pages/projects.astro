@@ -1,0 +1,111 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { getGitHubSnapshot } from '../lib/github';
+
+const github = await getGitHubSnapshot();
+const repos = github.repos;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={`项目 | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<style>
+			.summary {
+				display: grid;
+				grid-template-columns: repeat(4, minmax(0, 1fr));
+				gap: 0.6rem;
+				margin-bottom: 1rem;
+			}
+			.summary .chip {
+				justify-content: center;
+				padding: 0.5rem 0.6rem;
+				font-size: 0.85rem;
+			}
+			.repo-list {
+				display: grid;
+				gap: 0.85rem;
+				padding: 0;
+				margin: 0;
+				list-style: none;
+			}
+			.repo-card h2 {
+				font-size: 1.2rem;
+				margin-bottom: 0.5rem;
+			}
+			.repo-card h2 a {
+				text-decoration: none;
+				color: inherit;
+			}
+			.repo-card p {
+				color: var(--ink-soft);
+				margin-bottom: 0.8rem;
+			}
+			.repo-actions {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.45rem;
+				margin-top: 0.75rem;
+			}
+			.repo-actions a {
+				text-decoration: none;
+			}
+			@media (max-width: 860px) {
+				.summary {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section>
+				<h1>GitHub 项目总览</h1>
+				<p>和 `github.com/{github.profile.login}` 同步，展示公开仓库与活跃项目轨迹。</p>
+				<div class="summary">
+					<span class="chip" data-kind="accent">仓库 {repos.length}</span>
+					<span class="chip">Stars {github.totalStars}</span>
+					<span class="chip">非 Fork {repos.filter((repo) => !repo.fork).length}</span>
+					<span class="chip">Fork {repos.filter((repo) => repo.fork).length}</span>
+				</div>
+				<ul class="repo-list">
+					{
+						repos.map((repo) => (
+							<li class="card repo-card">
+								<h2>
+									<a href={repo.url} target="_blank">{repo.name}</a>
+								</h2>
+								<p>{repo.description}</p>
+								<div class="meta-line">
+									<span class="chip">{repo.language ?? 'Unknown'}</span>
+									{repo.fork && <span class="chip">Fork</span>}
+									<span class="chip">★ {repo.stars}</span>
+									<span class="chip">Forks {repo.forks}</span>
+									<span class="chip">更新 {repo.updatedAt.toLocaleDateString('zh-CN')}</span>
+								</div>
+								{repo.topics.length > 0 && (
+									<div class="repo-actions">
+										{repo.topics.slice(0, 6).map((topic) => <span class="chip">#{topic}</span>)}
+									</div>
+								)}
+								<div class="repo-actions">
+									<a class="chip" data-kind="accent" href={repo.url} target="_blank">仓库</a>
+									{
+										repo.homepage && (
+											<a class="chip" href={repo.homepage} target="_blank">Homepage</a>
+										)
+									}
+								</div>
+							</li>
+						))
+					}
+				</ul>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>

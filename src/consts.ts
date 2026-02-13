@@ -1,10 +1,13 @@
 export const SITE_TITLE = 'AI Binary Journal';
 export const SITE_DESCRIPTION =
-	'记录 AI 与二进制工程交叉学习过程的个人博客，包含逆向分析、LLM 工程与每周实验日志。';
-export const SITE_AUTHOR = 'Your Name';
+	'Emqo 的个人博客：围绕 AI、逆向与二进制工程的公开学习与项目实践。';
+export const SITE_AUTHOR = 'Emqo';
+export const GITHUB_USERNAME = 'Emqo';
+export const GITHUB_URL = `https://github.com/${GITHUB_USERNAME}`;
 
 export const NAV_LINKS = [
 	{ href: '/', label: '首页' },
+	{ href: '/projects', label: '项目' },
 	{ href: '/blog', label: '博客' },
 	{ href: '/tags', label: '标签' },
 	{ href: '/roadmap', label: '路线图' },
@@ -12,6 +15,7 @@ export const NAV_LINKS = [
 ];
 
 export const SOCIAL_LINKS = [
-	{ href: 'https://github.com/your-github', label: 'GitHub' },
+	{ href: GITHUB_URL, label: 'GitHub' },
+	{ href: `${GITHUB_URL}/${GITHUB_USERNAME}`, label: 'Profile README' },
 	{ href: '/rss.xml', label: 'RSS' },
 ];

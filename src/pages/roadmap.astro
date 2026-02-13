@@ -1,0 +1,50 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+
+const milestones = [
+	{
+		phase: 'Phase 1: 基础夯实（2-4 周）',
+		tasks: ['系统复习 ELF/PE 结构', '建立 GDB + pwndbg 调试模板', '完成 3 篇逆向基础文章'],
+	},
+	{
+		phase: 'Phase 2: AI 工程化（4-6 周）',
+		tasks: ['构建本地 RAG 知识库', '定义实验评测指标', '完成 3 篇 LLM 工程文章'],
+	},
+	{
+		phase: 'Phase 3: 交叉融合（长期）',
+		tasks: ['AI 辅助逆向流程自动化', '样本分析 pipeline 原型', '形成系列专题文章'],
+	},
+];
+---
+
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<BaseHead title={`路线图 | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section>
+				<h1>学习路线图</h1>
+				<p>从基础到交叉工程化，按阶段推进，避免“学很多但落不下”。</p>
+				<div class="card-grid">
+					{
+						milestones.map((item) => (
+							<article class="card">
+								<h2>{item.phase}</h2>
+								<ul>
+									{item.tasks.map((task) => <li>{task}</li>)}
+								</ul>
+							</article>
+						))
+					}
+				</div>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>

@@ -1,62 +1,50 @@
-# Astro Starter Kit: Blog
+# AI Binary Journal
 
-```sh
-npm create astro@latest -- --template blog
+个人博客项目，记录 AI 与二进制工程交叉方向的学习历程与实验。
+
+## 技术栈
+
+- Astro 5
+- MDX
+- Content Collections
+- RSS + Sitemap
+
+## 快速开始
+
+```bash
+npm install
+npm run dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+本地访问：`http://localhost:4321`
 
-Features:
-
-- ✅ Minimal styling (make it your own!)
-- ✅ 100/100 Lighthouse performance
-- ✅ SEO-friendly with canonical URLs and OpenGraph data
-- ✅ Sitemap support
-- ✅ RSS Feed support
-- ✅ Markdown & MDX support
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
+## 目录结构
 
 ```text
-├── public/
-├── src/
-│   ├── components/
-│   ├── content/
-│   ├── layouts/
-│   └── pages/
-├── astro.config.mjs
-├── README.md
-├── package.json
-└── tsconfig.json
+src/
+  components/   # 通用组件
+  content/blog/ # 博客文章 (Markdown/MDX)
+  layouts/      # 页面布局
+  lib/          # 内容查询工具函数
+  pages/        # 路由页面
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## 文章 Frontmatter
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+```yaml
+title: 文章标题
+description: 摘要
+pubDate: 2026-02-10
+updatedDate: 2026-02-12 # optional
+tags: [ai, binary]
+series: AI x Binary      # optional
+difficulty: intermediate # beginner|intermediate|advanced
+tools: [python, gdb]
+draft: false             # optional
+```
 
-The `src/content/` directory contains "collections" of related Markdown and MDX documents. Use `getCollection()` to retrieve posts from `src/content/blog/`, and type-check your frontmatter using an optional schema. See [Astro's Content Collections docs](https://docs.astro.build/en/guides/content-collections/) to learn more.
+## 上线前必改
 
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
-
-## Credit
-
-This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+1. 修改 `src/consts.ts` 中的 `SITE_AUTHOR` 与社交链接。
+2. 修改 `astro.config.mjs` 中的 `site` 为真实域名。
+3. 按需替换 `public/favicon.ico` 和 `public/favicon.svg`。

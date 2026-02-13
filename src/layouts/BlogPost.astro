@@ -8,49 +8,64 @@ import Header from '../components/Header.astro';
 
 type Props = CollectionEntry<'blog'>['data'];
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const {
+	title,
+	description,
+	pubDate,
+	updatedDate,
+	heroImage,
+	tags = [],
+	series,
+	difficulty = 'beginner',
+	tools = [],
+} = Astro.props;
 ---
 
-<html lang="en">
+<html lang="zh-CN">
 	<head>
 		<BaseHead title={title} description={description} />
 		<style>
 			main {
-				width: calc(100% - 2em);
-				max-width: 100%;
-				margin: 0;
+				width: min(900px, calc(100% - 1.5rem));
 			}
 			.hero-image {
 				width: 100%;
+				margin-bottom: 1rem;
 			}
 			.hero-image img {
 				display: block;
 				margin: 0 auto;
-				border-radius: 12px;
-				box-shadow: var(--box-shadow);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--surface-shadow);
 			}
 			.prose {
-				width: 720px;
-				max-width: calc(100% - 2em);
-				margin: auto;
-				padding: 1em;
-				color: rgb(var(--gray-dark));
+				padding: 1.1rem 1.2rem 0;
+				background: var(--bg-1);
+				border-radius: var(--radius-lg);
+				border: 1px solid var(--line);
 			}
 			.title {
-				margin-bottom: 1em;
-				padding: 1em 0;
-				text-align: center;
-				line-height: 1;
+				margin-bottom: 1rem;
+				padding-bottom: 1rem;
+				border-bottom: 1px solid var(--line);
 			}
 			.title h1 {
-				margin: 0 0 0.5em 0;
+				margin: 0.5rem 0 0.8rem;
 			}
 			.date {
-				margin-bottom: 0.5em;
-				color: rgb(var(--gray));
+				margin-bottom: 0.5rem;
 			}
 			.last-updated-on {
-				font-style: italic;
+				font-size: 0.85rem;
+			}
+			.description {
+				color: var(--ink-soft);
+			}
+			.tag-group {
+				margin-top: 0.65rem;
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.45rem;
 			}
 		</style>
 	</head>
@@ -64,18 +79,28 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				</div>
 				<div class="prose">
 					<div class="title">
-						<div class="date">
+						<div class="date meta-line">
 							<FormattedDate date={pubDate} />
+							<span class="chip" data-kind="accent">{difficulty}</span>
+							{series && <span class="chip">系列: {series}</span>}
 							{
 								updatedDate && (
-									<div class="last-updated-on">
-										Last updated on <FormattedDate date={updatedDate} />
-									</div>
+									<span class="last-updated-on">更新于 <FormattedDate date={updatedDate} /></span>
 								)
 							}
 						</div>
 						<h1>{title}</h1>
-						<hr />
+						<p class="description">{description}</p>
+						{tags.length > 0 && (
+							<div class="tag-group">
+								{tags.map((tag: string) => <a class="chip" href={`/tags/${tag}/`}>#{tag}</a>)}
+							</div>
+						)}
+						{tools.length > 0 && (
+							<div class="tag-group">
+								{tools.map((tool: string) => <span class="chip">{tool}</span>)}
+							</div>
+						)}
 					</div>
 					<slot />
 				</div>

@@ -1,48 +1,157 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { getPublishedPosts, listTags } from '../lib/blog';
+
+const publishedPosts = await getPublishedPosts();
+const latestPosts = publishedPosts.slice(0, 4);
+const topTags = listTags(publishedPosts).slice(0, 8);
+
+const tracks = [
+	{
+		title: 'Binary Fundamentals',
+		description: 'ELF/PE、汇编、调试器、内存布局。目标是建立可靠的底层心智模型。',
+	},
+	{
+		title: 'AI Systems Engineering',
+		description: 'LLM/RAG/Agent 工程化实践，关注评测、可靠性和可观测性。',
+	},
+	{
+		title: 'AI x Reverse Workflow',
+		description: '把 LLM 放进逆向流程：样本摘要、脚本生成、知识沉淀与检索。',
+	},
+];
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<style>
+			.hero {
+				display: grid;
+				grid-template-columns: 1.3fr 1fr;
+				gap: 1.2rem;
+				margin-bottom: 1.2rem;
+			}
+			.hero-copy {
+				padding: 1.35rem;
+				background: linear-gradient(145deg, #ffffff 0%, #eef5fb 100%);
+				border: 1px solid var(--line);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--surface-shadow);
+			}
+			.hero-copy p {
+				margin: 0 0 0.8rem;
+				color: var(--ink-soft);
+			}
+			.value-list {
+				padding-left: 1.2rem;
+				margin: 0;
+			}
+			.value-list li {
+				margin-bottom: 0.45rem;
+			}
+			.quick-panel {
+				padding: 1.1rem;
+				background: #0f1d2e;
+				color: #ecf3ff;
+				border-radius: var(--radius-lg);
+				border: 1px solid #24374f;
+			}
+			.quick-panel p {
+				color: #bfd0ea;
+				font-size: 0.95rem;
+				margin-bottom: 0.7rem;
+			}
+			.tag-list {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.45rem;
+			}
+			.tag-list a {
+				color: inherit;
+				text-decoration: none;
+			}
+			.latest-card h3 {
+				margin-bottom: 0.45rem;
+			}
+			.latest-card p {
+				margin-bottom: 0.75rem;
+				color: var(--ink-soft);
+			}
+			.tracks {
+				margin-top: 2rem;
+			}
+			@media (max-width: 880px) {
+				.hero {
+					grid-template-columns: 1fr;
+				}
+			}
+		</style>
 	</head>
 	<body>
 		<Header />
 		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This template
-				serves as a lightweight, minimally-styled starting point for anyone looking to build a personal
-				website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/">read the docs</a>
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
+			<section class="hero">
+				<div class="hero-copy">
+					<h1>AI 二进制工程学习档案</h1>
+					<p>{SITE_DESCRIPTION}</p>
+					<ul class="value-list">
+						<li>每篇都给出问题、过程、结论与可复现步骤。</li>
+						<li>关注 AI 与 Reverse 的交叉工作流，不做泛泛而谈。</li>
+						<li>持续发布周报，记录路线偏差与修正。</li>
+					</ul>
+				</div>
+				<div class="quick-panel">
+					<h2>当前聚焦</h2>
+					<p>优先把基础打牢，再逐步构建自动化分析链。</p>
+					<div class="tag-list">
+						{topTags.map(({ tag }) => <a class="chip" href={`/tags/${tag}/`}>#{tag}</a>)}
+					</div>
+				</div>
+			</section>
+
+			<section>
+				<div class="section-title">
+					<h2>最新文章</h2>
+				</div>
+				<div class="card-grid">
+					{
+						latestPosts.map((post) => (
+							<article class="card latest-card">
+								<h3>
+									<a href={`/blog/${post.id}/`}>{post.data.title}</a>
+								</h3>
+								<p>{post.data.description}</p>
+								<div class="meta-line">
+									<FormattedDate date={post.data.pubDate} />
+									<span class="chip" data-kind="accent">{post.data.difficulty}</span>
+								</div>
+							</article>
+						))
+					}
+				</div>
+			</section>
+
+			<section class="tracks">
+				<div class="section-title">
+					<h2>学习主线</h2>
+				</div>
+				<div class="card-grid">
+					{
+						tracks.map((track) => (
+							<article class="card">
+								<h3>{track.title}</h3>
+								<p>{track.description}</p>
+							</article>
+						))
+					}
+				</div>
+			</section>
 		</main>
 		<Footer />
 	</body>
